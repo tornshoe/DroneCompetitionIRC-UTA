@@ -1,1 +1,3 @@
 # DroneCompetitionIRC-UTA
+
+This is a very basic Python module for connecting to and reading/writing with the IRC server for the UAV/UGV drone competition hosted at UT Arlington. As is, the code can be used in a multi-threaded application with a command queue allowing the main thread to publish messages that this module will handle. If desirable, it should require minimal effort to adapt the module to be a standalone script.
