@@ -3,8 +3,12 @@ import irc.strings
 import queue
 
 class MyIRCBot(irc.bot.SingleServerIRCBot):
+
+    messagePrefix = "RTXDC_2024"
+
     def __init__(self, channel, nickname, server, command_queue = None, port=6667):
         irc.bot.SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
+        self.school = str(nickname).split("_")[0]
         self.command_queue = command_queue
         self.channel = channel
 
@@ -18,11 +22,11 @@ class MyIRCBot(irc.bot.SingleServerIRCBot):
                 continue
 
     def handle_command(self, command):
-        if command['action'] == "attack":
-            self.on_attack(command['message'])
+        if command['device'] == "UAV":
+            self.on_uav(command)
 
-        elif command['action'] == "hit":
-            self.on_hit()
+        elif command['device'] == "UGV":
+            self.on_ugv(command)
 
     def on_nicknameinuse(self, connection, event):
         connection.nick(connection.get_nickname() + "_")
@@ -38,11 +42,22 @@ class MyIRCBot(irc.bot.SingleServerIRCBot):
         self.do_command(event)
         return
 
-    def on_hit(self):
-        self.connection.privmsg(self.channel, self.connection.nickname + "Hit")
+    def on_ugv(self, message):
+        droneType = "UGV"
+        action = "Soaked!"
+        finalMessage = self.create_irc_message(message, droneType, action)
+        self.connection.privmsg(self.channel, finalMessage)
 
-    def on_attack(self, target):
-        self.connection.privmsg(self.channel, "Attacked " + str(target))
+    def on_uav(self, message):
+        droneType = "UAV"
+        action = "WaterBlast!"
+        finalMessage = self.create_irc_message(message, droneType, action)
+        self.connection.privmsg(self.channel, finalMessage)
+
+    def create_irc_message(self, command, droneType, action):
+        ircMessage = (self.messagePrefix + " " + self.school + "_" + droneType + "_" + action + "_" +
+                      str(command['markerId']) + "_" + str(command['time']) + "_" + str(command['gps']))
+        return ircMessage
 
     def do_command(self, event):
         nick = event.source.nick
